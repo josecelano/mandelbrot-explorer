@@ -1,0 +1,5 @@
+docker run --rm \
+    -v "$PWD":/var/www/html \
+    -w /var/www/html -u "$(id -u ${USER}):$(id -g ${USER})" \
+    node:12.16.3-stretch \
+    bash -c -c 'yarn install'

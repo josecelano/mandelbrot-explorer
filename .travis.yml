@@ -7,5 +7,6 @@ os:
   - linux
 
 script:
+  - ./bin/dev/install
   - ./bin/dev/test
   - ./bin/dev/lint
