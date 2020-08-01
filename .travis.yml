@@ -7,6 +7,7 @@ os:
   - linux
 
 script:
+  - cp .env.dist .env.local
   - ./bin/dev/install
   - ./bin/dev/test
   - ./bin/dev/lint
