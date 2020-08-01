@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mandelbrot-explorer
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: mandelbrot-explorer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mandelbrot-explorer
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mandelbrot-explorer
+  template:
+    metadata:
+      labels:
+        app: mandelbrot-explorer
+    spec:
+      containers:
+      - name: mandelbrot-explorer
+        image: josecelano/mandelbrot-explorer:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
