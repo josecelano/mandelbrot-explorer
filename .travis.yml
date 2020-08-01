@@ -1,0 +1,11 @@
+sudo: false
+
+services:
+  - docker
+
+os:
+  - linux
+
+script:
+  - ./bin/dev/test
+  - ./bin/dev/lint

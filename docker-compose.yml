@@ -1,0 +1,15 @@
+version: '2'
+
+services:
+  node:
+    image: node:12.16.3-stretch
+    volumes:
+      - $PWD:/var/www/html
+    working_dir: /var/www/html
+    command: su -c "cd /var/www/html && yarn && yarn serve" node
+    ports:
+      - "8080:8080"
+  api:
+    image: josecelano/mandelbrot-api
+    ports:
+      - "8081:80"
