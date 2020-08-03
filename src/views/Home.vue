@@ -1,9 +1,9 @@
 <template>
   <v-row>
-    <v-col cols="12" md="4">
-      <orbit :point="orbitPoint"></orbit>
+    <v-col cols="12" lg="4">
+        <orbit :point="orbitPoint"></orbit>
     </v-col>
-    <v-col cols="12" md="8">
+    <v-col cols="12" lg="8">
       <v-btn rounded @click="reset">reset</v-btn>
       <v-btn rounded @click="zoomIn">zoom in</v-btn>
       <v-btn rounded @click="zoomOut">zoom out</v-btn>
@@ -27,7 +27,7 @@ import {
   createTileFromCenterAndSize,
   getTileSize,
   getCenterPoint,
-  createTileFromCornerPoints
+  createTileFromCornerPoints,
 } from "@/tile";
 import Explorer from "@/components/Explorer.vue";
 import Orbit from "@/components/Orbit.vue";
@@ -36,46 +36,46 @@ export default {
   name: "Home",
   components: {
     Explorer,
-    Orbit
+    Orbit,
   },
   data: () => ({
     tileResolution: {
       width: 512,
-      height: 512
+      height: 512,
     },
     clickedZPoint: {
       real: 0,
-      imaginary: 0
+      imaginary: 0,
     },
     zoomFactor: 1.5,
     initialTile: {
       left_bottom_zx: -1.5,
       left_bottom_zy: -1,
       top_right_zx: 0.5,
-      top_right_zy: 1
+      top_right_zy: 1,
     },
     initialOrbitPoint: {
       real: 0,
-      imaginary: 0
-    }
+      imaginary: 0,
+    },
   }),
   computed: {
     leftBottomPoint() {
       return {
         real: Number(this.$route.query.left_bottom_zx),
-        imaginary: Number(this.$route.query.left_bottom_zy)
+        imaginary: Number(this.$route.query.left_bottom_zy),
       };
     },
     topRightPoint() {
       return {
         real: Number(this.$route.query.top_right_zx),
-        imaginary: Number(this.$route.query.top_right_zy)
+        imaginary: Number(this.$route.query.top_right_zy),
       };
     },
     orbitPoint() {
       return {
         real: Number(this.$route.query.orbit_zx),
-        imaginary: Number(this.$route.query.orbit_zy)
+        imaginary: Number(this.$route.query.orbit_zy),
       };
     },
     tile() {
@@ -86,7 +86,7 @@ export default {
     },
     tileSize() {
       return getTileSize(this.tile);
-    }
+    },
   },
   created() {
     if (this.noUrlQueryParamsDefined()) {
@@ -121,7 +121,7 @@ export default {
         top_right_zx: String(newTile.top_right_zx),
         top_right_zy: String(newTile.top_right_zy),
         orbit_zx: String(neworbitPoint.real),
-        orbit_zy: String(neworbitPoint.imaginary)
+        orbit_zy: String(neworbitPoint.imaginary),
       };
 
       if (objectsAreEqual(this.$route.query, newQuery)) return;
@@ -149,7 +149,7 @@ export default {
         newScaledTile,
         getCenterPoint(newScaledTile)
       );
-    }
-  }
+    },
+  },
 };
 </script>

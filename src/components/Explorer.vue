@@ -2,27 +2,28 @@
   <v-row align="start">
     <v-col cols="12" md="6">
       <v-card>
-        <v-card-title class="subheading font-weight-bold">Explorer</v-card-title>
-        <v-card-subtitle
-          class="subheading font-weight-bold"
-        >Double click on a the Mandelbrot Set image to center and zoom in</v-card-subtitle>
-        <v-divider></v-divider>
-        <v-card-text>
-          <v-stage ref="tileStage" :config="stageConfig">
-            <v-layer
-              ref="tileLayer"
-              @mousemove="onMouseMove"
-              @mouseout="onMouseOut"
-              @click="onClick"
-              @dblclick="onDoubleClick"
-            >
-              <v-image :config="{image: image}" />
-            </v-layer>
-          </v-stage>
-
-          <v-progress-linear :active="imageLoading" :value="imageLoadPercentage"></v-progress-linear>
-          <span v-if="imageLoading">Loading image ...</span>
-        </v-card-text>
+        <v-responsive :min-width="stageConfig.width">
+          <v-card-title class="subheading font-weight-bold">Explorer</v-card-title>
+          <v-card-subtitle
+            class="subheading font-weight-bold"
+          >Double click on a the Mandelbrot Set image to center and zoom in</v-card-subtitle>
+          <v-divider></v-divider>
+          <v-card-text>
+            <v-stage ref="tileStage" :config="stageConfig">
+              <v-layer
+                ref="tileLayer"
+                @mousemove="onMouseMove"
+                @mouseout="onMouseOut"
+                @click="onClick"
+                @dblclick="onDoubleClick"
+              >
+                <v-image :config="{x:0, y:0, image: image}" />
+              </v-layer>
+            </v-stage>
+            <v-progress-linear :active="imageLoading" :value="imageLoadPercentage"></v-progress-linear>
+            <span v-if="imageLoading">Loading image ...</span>
+          </v-card-text>
+        </v-responsive>
       </v-card>
       <v-container>
         <color-card></color-card>
@@ -54,7 +55,7 @@ import {
   getTileSize,
   createTileFromCornerPoints,
   getPixelSize,
-  calculateZPointForPixelCoordinates
+  calculateZPointForPixelCoordinates,
 } from "@/tile";
 import ColorCard from "@/components/ColorCard.vue";
 import DownloadsCard from "@/components/DownloadsCard.vue";
@@ -65,7 +66,7 @@ export default {
   components: {
     ColorCard,
     DownloadsCard,
-    ExplorerPanel
+    ExplorerPanel,
   },
   props: ["tileResolution", "leftBottomPoint", "topRightPoint"],
   data: () => ({
@@ -75,16 +76,16 @@ export default {
     imageLoadPercentage: 0,
     pointerPixel: {
       x: null,
-      y: null
+      y: null,
     },
     clickedPixel: {
       x: null,
-      y: null
+      y: null,
     },
     clickedZPoint: {
       real: 0,
-      imaginary: 0
-    }
+      imaginary: 0,
+    },
   }),
   computed: {
     tile() {
@@ -99,28 +100,28 @@ export default {
     pixelSize() {
       return getPixelSize(this.tile, this.tileResolution);
     },
-    tileCommonUrlParams: function() {
+    tileCommonUrlParams: function () {
       return {
         left_bottom_zx: this.leftBottomPoint.real,
         left_bottom_zy: this.leftBottomPoint.imaginary,
         top_right_zx: this.topRightPoint.real,
         top_right_zy: this.topRightPoint.imaginary,
         res_x: this.tileResolution.width,
-        res_y: this.tileResolution.height
+        res_y: this.tileResolution.height,
       };
     },
     stageConfig() {
       return {
         width: this.tileResolution.width,
-        height: this.tileResolution.height
+        height: this.tileResolution.height,
       };
-    }
+    },
   },
   watch: {
     tileCommonUrlParams(newValue, oldValue) {
       if (objectsAreEqual(newValue, oldValue)) return;
       this.updateTile();
-    }
+    },
   },
   created() {
     this.updateTile();
@@ -138,13 +139,13 @@ export default {
       const mousePos = this.$refs.tileStage.getNode().getPointerPosition();
       this.pointerPixel = {
         x: mousePos.x,
-        y: mousePos.y
+        y: mousePos.y,
       };
     },
     onMouseOut() {
       this.pointerPixel = {
         x: null,
-        y: null
+        y: null,
       };
     },
     updateTile() {
@@ -154,7 +155,7 @@ export default {
       const mousePos = this.$refs.tileStage.getNode().getPointerPosition();
       this.clickedPixel = {
         x: mousePos.x,
-        y: mousePos.y
+        y: mousePos.y,
       };
     },
     calculateZPointForClickedPosition() {
@@ -164,7 +165,7 @@ export default {
         this.clickedPixel
       );
     },
-    imageUrl: function() {
+    imageUrl: function () {
       return api.buildTileImageEndpointUrl(
         this.tileCommonUrlParams,
         COLOR_MAP.COLORED_PERIODS
@@ -188,7 +189,7 @@ export default {
     hideDownloadProgressBar() {
       this.imageLoading = false;
       clearInterval(this.timerInterval);
-    }
-  }
+    },
+  },
 };
 </script>
