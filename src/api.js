@@ -26,6 +26,15 @@ export default {
         return this.buildTileEndpointUrl(tileUrlParams);
     },
 
+    buildAsciiGraphEndpointUrl(tileCommonUrlParams, ascii_map) {
+        const tileUrlParams = {
+            ...tileCommonUrlParams,
+            format: FORMAT.ASCII_GRAPH,
+            ascii_map
+        };
+        return this.buildTileEndpointUrl(tileUrlParams);
+    },    
+
     buildTileEndpointUrl(params) {
         const tileUrl = new URL(`${process.env.VUE_APP_API_URL}/tiles`);
         tileUrl.search = new URLSearchParams(params);

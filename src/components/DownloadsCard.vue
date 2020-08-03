@@ -5,25 +5,25 @@
     <div class="pa-5">
       <ul>
         <li>
-          <a target="_blank" :href="imageUrl(0)">Download image "black on white"</a>
+          <a target="_blank" :href="imageUrl(0)">Image "black on white"</a>
         </li>
         <li>
-          <a target="_blank" :href="imageUrl(1)">Download image "white on black"</a>
+          <a target="_blank" :href="imageUrl(1)">Image "white on black"</a>
         </li>
         <li>
-          <a target="_blank" :href="imageUrl(2)">Download image "colored periods"</a>
+          <a target="_blank" :href="imageUrl(2)">Image "colored periods"</a>
         </li>
         <li>
-          <a target="_blank" :href="asciiGraphUrl(0)">Download ASCII graph "@"</a>
+          <a target="_blank" :href="asciiGraphUrl(0)">ASCII graph "@"</a>
         </li>
         <li>
-          <a target="_blank" :href="asciiGraphUrl(1)">Download ASCII graph "number of interations"</a>
+          <a target="_blank" :href="asciiGraphUrl(1)">ASCII graph "number of interations"</a>
         </li>
         <li>
-          <a target="_blank" :href="asciiGraphUrl(2)">Download ASCII graph "iterations inside"</a>
+          <a target="_blank" :href="asciiGraphUrl(2)">ASCII graph "iterations inside"</a>
         </li>
         <li>
-          <a target="_blank" :href="asciiGraphUrl(3)">Download ASCII graph "periods"</a>
+          <a target="_blank" :href="asciiGraphUrl(3)">ASCII graph "periods"</a>
         </li>
       </ul>
     </div>
@@ -37,22 +37,15 @@ export default {
   name: "DownloadsCard",
   props: ["tileCommonUrlParams"],
   methods: {
-    imageUrl: function(color_map) {
-      const tileUrlParams = {
-        ...this.tileCommonUrlParams,
-        format: 0, // PNG image
-        color_map
-      };
-      return api.buildTileEndpointUrl(tileUrlParams);
+    imageUrl: function (color_map) {
+      return api.buildTileImageEndpointUrl(this.tileCommonUrlParams, color_map);
     },
-    asciiGraphUrl: function(ascii_map) {
-      const tileUrlParams = {
-        ...this.tileCommonUrlParams,
-        format: 1, // Ascii graph
+    asciiGraphUrl: function (ascii_map) {
+      return api.buildAsciiGraphEndpointUrl(
+        this.tileCommonUrlParams,
         ascii_map
-      };
-      return api.buildTileEndpointUrl(tileUrlParams);
-    }
-  }
+      );
+    },
+  },
 };
 </script>
