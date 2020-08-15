@@ -18,36 +18,9 @@
                 @dblclick="onDoubleClick"
               >
                 <v-image
-                  :config="{
-                  image: image00, 
-                  x:0, 
-                  y:0, 
-                  width: 256, 
-                  height: 256}"
-                />
-                <v-image
-                  :config="{
-                  image: image01, 
-                  x:256, 
-                  y:0, 
-                  width: 256, 
-                  height: 256}"
-                />
-                <v-image
-                  :config="{
-                  image: image10, 
-                  x:0, 
-                  y:256, 
-                  width: 256, 
-                  height: 256}"
-                />
-                <v-image
-                  :config="{
-                  image: image11, 
-                  x:256, 
-                  y:256, 
-                  width: 256, 
-                  height: 256}"
+                  v-for="(image, index) in imageTiles"
+                  v-bind:key="index"
+                  :config="gridTileConfig(index, image)"
                 />
               </v-layer>
             </v-stage>
@@ -102,10 +75,12 @@ export default {
   },
   props: ["tileResolution", "leftBottomPoint", "topRightPoint"],
   data: () => ({
-    image00: null,
-    image01: null,
-    image10: null,
-    image11: null,
+    imageTiles: [],
+    numberOfImageTilesLoaded: 0,
+    imageGrid: {
+      rows: 4,
+      cols: 4,
+    },
     timerInterval: null,
     imageLoading: false,
     imageLoadPercentage: 0,
@@ -151,6 +126,15 @@ export default {
         height: this.tileResolution.height,
       };
     },
+    gridTileSize() {
+      return {
+        width: this.tileResolution.width / this.imageGrid.cols,
+        height: this.tileResolution.height / this.imageGrid.rows,
+      };
+    },
+    gridNumberOfTiles() {
+      return this.imageGrid.rows * this.imageGrid.cols;
+    },
   },
   watch: {
     tileCommonUrlParams(newValue, oldValue) {
@@ -184,7 +168,7 @@ export default {
       };
     },
     updateTile() {
-      this.fetchTileFromAPI();
+      this.fetchTilesFromAPI();
     },
     updateClickPosition() {
       const mousePos = this.$refs.tileStage.getNode().getPointerPosition();
@@ -206,83 +190,60 @@ export default {
         COLOR_MAP.COLORED_PERIODS
       );
     },
-    async fetchTileFromAPI() {
+    gridTileConfig(index, image) {
+      const tileWidth = this.gridTileSize.width;
+      const tileHeight = this.gridTileSize.height;
+
+      const row = Math.floor(index / this.imageGrid.cols);
+      const col = index % this.imageGrid.cols;
+
+      return {
+        image: image,
+        x: col * tileWidth,
+        y: row * tileHeight,
+        width: tileWidth,
+        height: tileHeight,
+      };
+    },
+    fetchTilesFromAPI() {
+      this.numberOfImageTilesLoaded = 0;
+      this.imageTiles = Array(this.gridNumberOfTiles);
+
       this.showDownloadProgressBar();
 
-      const grid = splitIntoGrid(this.tile, 2, 2);
-
-      // image00
-      const tile00 = grid[0][0];
-      const imageUrl00 = api.buildTileImageEndpointUrl(
-        {
-          left_bottom_zx: tile00.leftBottomPoint.real,
-          left_bottom_zy: tile00.leftBottomPoint.imaginary,
-          top_right_zx: tile00.topRightPoint.real,
-          top_right_zy: tile00.topRightPoint.imaginary,
-          res_x: this.tileResolution.width / 2,
-          res_y: this.tileResolution.height / 2,
-        },
-        COLOR_MAP.COLORED_PERIODS
+      const grid = splitIntoGrid(
+        this.tile,
+        this.imageGrid.rows,
+        this.imageGrid.cols
       );
 
-      // image01
-      const tile01 = grid[0][1];
-      const imageUrl01 = api.buildTileImageEndpointUrl(
-        {
-          left_bottom_zx: tile01.leftBottomPoint.real,
-          left_bottom_zy: tile01.leftBottomPoint.imaginary,
-          top_right_zx: tile01.topRightPoint.real,
-          top_right_zy: tile01.topRightPoint.imaginary,
-          res_x: this.tileResolution.width / 2,
-          res_y: this.tileResolution.height / 2,
-        },
-        COLOR_MAP.COLORED_PERIODS
-      );
+      let row, col, index;
 
-      // image10
-      const tile10 = grid[1][0];
-      const imageUrl10 = api.buildTileImageEndpointUrl(
-        {
-          left_bottom_zx: tile10.leftBottomPoint.real,
-          left_bottom_zy: tile10.leftBottomPoint.imaginary,
-          top_right_zx: tile10.topRightPoint.real,
-          top_right_zy: tile10.topRightPoint.imaginary,
-          res_x: this.tileResolution.width / 2,
-          res_y: this.tileResolution.height / 2,
-        },
-        COLOR_MAP.COLORED_PERIODS
-      );
-
-      // image11
-      const tile11 = grid[1][1];
-      const imageUrl11 = api.buildTileImageEndpointUrl(
-        {
-          left_bottom_zx: tile11.leftBottomPoint.real,
-          left_bottom_zy: tile11.leftBottomPoint.imaginary,
-          top_right_zx: tile11.topRightPoint.real,
-          top_right_zy: tile11.topRightPoint.imaginary,
-          res_x: this.tileResolution.width / 2,
-          res_y: this.tileResolution.height / 2,
-        },
-        COLOR_MAP.COLORED_PERIODS
-      );
-
-      await Promise.all([
-        api.fetchTile(imageUrl00).then((image) => {
-          this.image00 = image;
-        }),
-        api.fetchTile(imageUrl01).then((image) => {
-          this.image01 = image;
-        }),
-        api.fetchTile(imageUrl10).then((image) => {
-          this.image10 = image;
-        }),
-        api.fetchTile(imageUrl11).then((image) => {
-          this.image11 = image;
-        }),
-      ]);
-
-      this.hideDownloadProgressBar();
+      index = 0;
+      for (row = 0; row < this.imageGrid.rows; row++) {
+        for (col = 0; col < this.imageGrid.cols; col++) {
+          const tile = grid[row][col];
+          const imageUrl = api.buildTileImageEndpointUrl(
+            {
+              left_bottom_zx: tile.leftBottomPoint.real,
+              left_bottom_zy: tile.leftBottomPoint.imaginary,
+              top_right_zx: tile.topRightPoint.real,
+              top_right_zy: tile.topRightPoint.imaginary,
+              res_x: this.tileResolution.width / this.imageGrid.cols,
+              res_y: this.tileResolution.height / this.imageGrid.rows,
+            },
+            COLOR_MAP.COLORED_PERIODS
+          );
+          api.fetchTile(imageUrl, index).then((tile) => {
+            this.imageTiles.splice(tile.index, 1, tile.image);
+            this.numberOfImageTilesLoaded++;
+            if (this.numberOfImageTilesLoaded >= this.gridNumberOfTiles) {
+              this.hideDownloadProgressBar();
+            }
+          });
+          index++;
+        }
+      }
     },
     showDownloadProgressBar() {
       this.timerInterval = setInterval(

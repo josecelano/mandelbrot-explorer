@@ -33,7 +33,7 @@ export default {
             ascii_map
         };
         return this.buildTileEndpointUrl(tileUrlParams);
-    },    
+    },
 
     buildTileEndpointUrl(params) {
         const tileUrl = new URL(`${process.env.VUE_APP_API_URL}/tiles`);
@@ -41,12 +41,15 @@ export default {
         return tileUrl.href;
     },
 
-    fetchTile(tileUrl) {
+    fetchTile(tileUrl, index) {
         return new Promise((resolve) => {
             const tileImage = new window.Image();
             tileImage.src = tileUrl;
             tileImage.onload = () => {
-                resolve(tileImage);
+                resolve({
+                    index,
+                    image: tileImage,
+                });
             };
         })
     },
