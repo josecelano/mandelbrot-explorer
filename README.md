@@ -80,11 +80,16 @@ helm install cert-manager --version v0.14.1 --namespace cert-manager jetstack/ce
 kubectl create -f ./deploy/k8s/production-issuer.yaml
 ```
 
-Deploy app:
+Deploy app the first time:
 ```shell
 kubectl create -f ./deploy/k8s/mandelbrot-explorer.yaml
 kubectl create -f ./deploy/k8s/mandelbrot-explorer-ingress.yaml
 ```
+
+Re-deploy app after changing docker image:
+```
+kubectl rollout restart deployment mandelbrot-explorer
+`` 
 
 After executing `create` commands you should see something like:
 
