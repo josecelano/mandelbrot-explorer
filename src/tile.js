@@ -154,3 +154,32 @@ export function calculateZPointForPixelCoordinates(tile, resolution, pixelCoordi
             pixelSize.height
     };
 }
+
+export function splitIntoGrid(tile, rows, cols) {
+
+    const size = getTileSize(tile);
+    const cellWidth = size.width / cols;
+    const cellHeight = size.height / rows;
+
+    const top = tile.topRightPoint.imaginary;
+    const left = tile.leftBottomPoint.real;
+
+    let grid = [[]];
+    for (var row = 0; row < rows; row++) {
+        grid[row] = [];
+        for (var col = 0; col < cols; col++) {
+            grid[row][col] = {
+                leftBottomPoint: {
+                    real: left + cellWidth * col,
+                    imaginary: top - cellHeight * (row + 1)
+                },
+                topRightPoint: {
+                    real: left + cellWidth * (col + 1),
+                    imaginary: top - cellHeight * (row)
+                }
+            };
+        }
+    }
+
+    return grid;
+}

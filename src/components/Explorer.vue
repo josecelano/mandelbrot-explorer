@@ -17,7 +17,38 @@
                 @click="onClick"
                 @dblclick="onDoubleClick"
               >
-                <v-image :config="{x:0, y:0, image: image}" />
+                <v-image
+                  :config="{
+                  image: image00, 
+                  x:0, 
+                  y:0, 
+                  width: 256, 
+                  height: 256}"
+                />
+                <v-image
+                  :config="{
+                  image: image01, 
+                  x:256, 
+                  y:0, 
+                  width: 256, 
+                  height: 256}"
+                />
+                <v-image
+                  :config="{
+                  image: image10, 
+                  x:0, 
+                  y:256, 
+                  width: 256, 
+                  height: 256}"
+                />
+                <v-image
+                  :config="{
+                  image: image11, 
+                  x:256, 
+                  y:256, 
+                  width: 256, 
+                  height: 256}"
+                />
               </v-layer>
             </v-stage>
             <v-progress-linear :active="imageLoading" :value="imageLoadPercentage"></v-progress-linear>
@@ -56,6 +87,7 @@ import {
   createTileFromCornerPoints,
   getPixelSize,
   calculateZPointForPixelCoordinates,
+  splitIntoGrid,
 } from "@/tile";
 import ColorCard from "@/components/ColorCard.vue";
 import DownloadsCard from "@/components/DownloadsCard.vue";
@@ -70,7 +102,10 @@ export default {
   },
   props: ["tileResolution", "leftBottomPoint", "topRightPoint"],
   data: () => ({
-    image: null,
+    image00: null,
+    image01: null,
+    image10: null,
+    image11: null,
     timerInterval: null,
     imageLoading: false,
     imageLoadPercentage: 0,
@@ -173,9 +208,80 @@ export default {
     },
     async fetchTileFromAPI() {
       this.showDownloadProgressBar();
-      this.image = await api.fetchTile(this.imageUrl());
-      this.image.width = this.tileResolution.width;
-      this.image.height = this.tileResolution.height;
+
+      const grid = splitIntoGrid(this.tile, 2, 2);
+
+      // image00
+      const tile00 = grid[0][0];
+      const imageUrl00 = api.buildTileImageEndpointUrl(
+        {
+          left_bottom_zx: tile00.leftBottomPoint.real,
+          left_bottom_zy: tile00.leftBottomPoint.imaginary,
+          top_right_zx: tile00.topRightPoint.real,
+          top_right_zy: tile00.topRightPoint.imaginary,
+          res_x: this.tileResolution.width / 2,
+          res_y: this.tileResolution.height / 2,
+        },
+        COLOR_MAP.COLORED_PERIODS
+      );
+
+      // image01
+      const tile01 = grid[0][1];
+      const imageUrl01 = api.buildTileImageEndpointUrl(
+        {
+          left_bottom_zx: tile01.leftBottomPoint.real,
+          left_bottom_zy: tile01.leftBottomPoint.imaginary,
+          top_right_zx: tile01.topRightPoint.real,
+          top_right_zy: tile01.topRightPoint.imaginary,
+          res_x: this.tileResolution.width / 2,
+          res_y: this.tileResolution.height / 2,
+        },
+        COLOR_MAP.COLORED_PERIODS
+      );
+
+      // image10
+      const tile10 = grid[1][0];
+      const imageUrl10 = api.buildTileImageEndpointUrl(
+        {
+          left_bottom_zx: tile10.leftBottomPoint.real,
+          left_bottom_zy: tile10.leftBottomPoint.imaginary,
+          top_right_zx: tile10.topRightPoint.real,
+          top_right_zy: tile10.topRightPoint.imaginary,
+          res_x: this.tileResolution.width / 2,
+          res_y: this.tileResolution.height / 2,
+        },
+        COLOR_MAP.COLORED_PERIODS
+      );
+
+      // image11
+      const tile11 = grid[1][1];
+      const imageUrl11 = api.buildTileImageEndpointUrl(
+        {
+          left_bottom_zx: tile11.leftBottomPoint.real,
+          left_bottom_zy: tile11.leftBottomPoint.imaginary,
+          top_right_zx: tile11.topRightPoint.real,
+          top_right_zy: tile11.topRightPoint.imaginary,
+          res_x: this.tileResolution.width / 2,
+          res_y: this.tileResolution.height / 2,
+        },
+        COLOR_MAP.COLORED_PERIODS
+      );
+
+      await Promise.all([
+        api.fetchTile(imageUrl00).then((image) => {
+          this.image00 = image;
+        }),
+        api.fetchTile(imageUrl01).then((image) => {
+          this.image01 = image;
+        }),
+        api.fetchTile(imageUrl10).then((image) => {
+          this.image10 = image;
+        }),
+        api.fetchTile(imageUrl11).then((image) => {
+          this.image11 = image;
+        }),
+      ]);
+
       this.hideDownloadProgressBar();
     },
     showDownloadProgressBar() {

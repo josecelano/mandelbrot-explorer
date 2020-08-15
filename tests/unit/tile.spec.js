@@ -11,7 +11,8 @@ import {
   getTileSize,
   translateToPoint,
   getPixelSize,
-  calculateZPointForPixelCoordinates
+  calculateZPointForPixelCoordinates,
+  splitIntoGrid
 } from '@/tile'
 
 describe('tile', () => {
@@ -342,4 +343,142 @@ describe('tile', () => {
     expect(zlb).toStrictEqual({ real: 0, imaginary: 1 });
   })
 
+  it('could be splitted into a 4 pieces grid', () => {
+    const tile = {
+      leftBottomPoint: {
+        real: 0,
+        imaginary: 0
+      },
+      topRightPoint: {
+        real: 2,
+        imaginary: 2
+      }
+    };
+
+    const rows = 2;
+    const cols = 2;
+
+    const tiles = splitIntoGrid(tile, rows, cols);
+
+    const tile00 = {
+      leftBottomPoint: {
+        real: 0,
+        imaginary: 1
+      },
+      topRightPoint: {
+        real: 1,
+        imaginary: 2
+      }
+    };
+
+    const tile01 = {
+      leftBottomPoint: {
+        real: 1,
+        imaginary: 1
+      },
+      topRightPoint: {
+        real: 2,
+        imaginary: 2
+      }
+    };
+
+    const tile10 = {
+      leftBottomPoint: {
+        real: 0,
+        imaginary: 0
+      },
+      topRightPoint: {
+        real: 1,
+        imaginary: 1
+      }
+    };
+
+    const tile11 = {
+      leftBottomPoint: {
+        real: 1,
+        imaginary: 0
+      },
+      topRightPoint: {
+        real: 2,
+        imaginary: 1
+      }
+    };
+
+    const expectedTiles = [
+      [tile00, tile01],
+      [tile10, tile11]
+    ];
+
+    expect(tiles).toStrictEqual(expectedTiles);
+  })
+
+
+  it('could be splitted into a 4 pieces grid when size is not divisible by 2', () => {
+    const tile = {
+      leftBottomPoint: {
+        real: -1,
+        imaginary: -1
+      },
+      topRightPoint: {
+        real: 2,
+        imaginary: 2
+      }
+    };
+
+    const rows = 2;
+    const cols = 2;
+
+    const tiles = splitIntoGrid(tile, rows, cols);
+
+    const tile00 = {
+      leftBottomPoint: {
+        real: -1,
+        imaginary: 0.5
+      },
+      topRightPoint: {
+        real: 0.5,
+        imaginary: 2
+      }
+    };
+
+    const tile01 = {
+      leftBottomPoint: {
+        real: 0.5,
+        imaginary: 0.5
+      },
+      topRightPoint: {
+        real: 2,
+        imaginary: 2
+      }
+    };
+
+    const tile10 = {
+      leftBottomPoint: {
+        real: -1,
+        imaginary: -1
+      },
+      topRightPoint: {
+        real: 0.5,
+        imaginary: 0.5
+      }
+    };
+
+    const tile11 = {
+      leftBottomPoint: {
+        real: 0.5,
+        imaginary: -1
+      },
+      topRightPoint: {
+        real: 2,
+        imaginary: 0.5
+      }
+    };
+
+    const expectedTiles = [
+      [tile00, tile01],
+      [tile10, tile11]
+    ];
+
+    expect(tiles).toStrictEqual(expectedTiles);
+  })
 })
