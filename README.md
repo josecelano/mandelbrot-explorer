@@ -89,7 +89,7 @@ kubectl create -f ./deploy/k8s/mandelbrot-explorer-ingress.yaml
 Re-deploy app after changing docker image:
 ```
 kubectl rollout restart deployment mandelbrot-explorer
-`` 
+```
 
 After executing `create` commands you should see something like:
 
