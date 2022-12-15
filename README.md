@@ -25,10 +25,6 @@ docker run --rm -p80:80 josecelano/mandelbrot-explorer
 
 And open <http://localhost> in your browser.
 
-Or you can use the de online demo: <https://mandelbrot-set-periods.online>
-
-Or you can install the project locally (see development section).
-
 ## Development
 
 Requirements:
